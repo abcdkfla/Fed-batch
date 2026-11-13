@@ -352,8 +352,8 @@ td,th {font-variant-numeric:tabular-nums}
       <div class="workbench">
         <form id="setup" class="card">
           <h2 class="panel-title">운전 설계 <span>6개 변수</span></h2>
-          <label>목표 비성장속도 (h⁻¹)<select id="mu" aria-describedby="mu-help"></select></label>
-          <p id="mu-help" class="t-secondary">0시간부터 목표 비성장속도를 적용합니다. 산소나 기질이 부족해 목표를 유지할 수 없으면 종료합니다.</p>
+          <label>공급 단계 목표 비성장속도 (h⁻¹)<select id="mu" aria-describedby="mu-help"></select></label>
+          <p id="mu-help" class="t-secondary">초기 배치는 추가 공급 없이 μmax = 0.44 h⁻¹을 상한으로 성장합니다. 기질과 산소가 충분할 때 이 값에 가까워집니다. 첫 글루코스 공급부터 설정한 μ를 적용합니다.</p>
           <label>교반 (rpm)<select id="rpm"></select></label>
           <label>초기 배양 부피 (L)<select id="volume"></select></label>
           <label>공기 통기량 (vvm)<select id="vvm" aria-describedby="air-help"></select></label>
@@ -376,13 +376,13 @@ td,th {font-variant-numeric:tabular-nums}
                 <path d="M35 50h110M90 30v98m-20 0 20 9 20-9M55 175h70M74 30h32V13H74Z" fill="none" stroke="#53777b" stroke-width="4" stroke-linecap="round"/>
               </svg><strong id="vessel-label"></strong>
             </div>
-            <div><h2 class="panel-title">종료 상태</h2><p id="end-info"></p><p class="t-secondary">24시간, 2.5 L, 목표 μ 유지 불가 중 먼저 발생한 시점에 종료합니다.</p><p><a href="#explore">공급 개시 조건 비교 →</a></p></div>
+            <div><h2 class="panel-title">24시간 결과</h2><p id="end-info"></p><p class="t-secondary">2.5 L에 도달하면 공급만 중단합니다. 계산 μ가 목표보다 낮아도 24시간까지 진행해 수율을 비교합니다.</p><p><a href="#explore">공급 개시 조건 비교 →</a></p></div>
           </article>
         </div>
       </div>
     </section>
     <section class="section" id="trend" hidden>
-      <div class="section-head"><h1>배양 추세</h1><p>0시간부터 목표 μ를 적용합니다. 마지막 점에는 종료 시점의 모델 계산값을 표시합니다.</p></div>
+      <div class="section-head"><h1>배양 추세</h1><p>초기 배치에는 설정 μ를 적용하지 않습니다. 첫 글루코스 공급부터 적용하며, 공급이 잠시 멈춰도 유지합니다.</p></div>
       <article class="card"><div class="design-toolbar"><label>표시 변수 <select id="series"></select></label><output id="point"></output></div>
         <svg id="graph" viewBox="0 0 880 340" role="img" aria-label="배양 시간에 따른 선택 지표 변화"></svg>
         <label class="time-control">조회 시간 <input id="time" type="range" min="0" max="24" value="0"></label>
@@ -400,9 +400,9 @@ td,th {font-variant-numeric:tabular-nums}
       <div class="section-head"><h1>수식·고정값</h1><p>계산에 쓰는 식과 참고 전용 값을 구분했습니다.</p></div>
       <article class="card"><h2 class="panel-title">균주·장비 고정값</h2><div class="tablewrap"><table><thead><tr><th>항목</th><th>값</th><th>적용</th></tr></thead><tbody id="constants"></tbody></table></div></article>
       <article class="card formulas"><h2 class="panel-title">모델에 사용하는 식</h2>
-        <p><b>성장·기질:</b> μ<sub>Monod</sub> = μ<sub>max</sub>·S/(K<sub>S</sub>+S). 0시간부터 μ = min(μ<sub>Monod</sub>, μ<sub>set</sub>, μ<sub>산소 한도</sub>). 목표 μ를 유지할 수 없는 첫 계산점에서 종료합니다. q<sub>S</sub> = μ/Y + m<sub>S</sub></p>
+        <p><b>성장·기질:</b> μ<sub>Monod</sub> = μ<sub>max</sub>·S/(K<sub>S</sub>+S). 배치 중에는 μ = min(μ<sub>Monod</sub>, μ<sub>산소 한도</sub>). 첫 공급부터 μ<sub>set</sub> 상한을 추가합니다. 목표 μ를 유지할 수 없어도 계산은 24시간까지 진행합니다. q<sub>S</sub> = μ/Y + m<sub>S</sub></p>
         <p><b>산소 전달:</b> P₀ = NₚρN³d⁵n, P<sub>g</sub> = 0.5P₀, v<sub>s</sub> = Q/A, k<sub>L</sub>a = 0.026(P<sub>g</sub>/V)<sup>0.4</sup>v<sub>s</sub><sup>0.5</sup> (s⁻¹), OTR = k<sub>L</sub>a(C*−C)</p>
-        <p><b>산소 제한:</b> OUR ≈ 12q<sub>S</sub>X. OTR 상한(k<sub>L</sub>a·C*, 단위 환산 후)을 넘지 않도록 μ와 소비량을 제한합니다. DO는 정상상태 근사입니다.</p>
+        <p><b>산소 제한:</b> 유입 공기의 산소 분율은 21%, 포화 DO는 7.53 mg/L로 가정합니다. 목표 DO₂는 2.26 mg/L(약 30%)이며, 목표 DO₂를 유지하며 공급 가능한 산소는 k<sub>L</sub>a·(C*−DO₂ 목표)/32입니다(k<sub>L</sub>a 단위 h⁻¹). 산소가 부족하면 계산 μ를 낮추고 계속 진행합니다. 그래프의 DO는 정상상태 모델 계산값입니다.</p>
         <p><b>공급 제어:</b> S ≤ S<sub>전환</sub>이면 F<sub>s</sub> = (μ<sub>set</sub>/Y + m<sub>S</sub>)·XV/(c<sub>S</sub>−S<sub>전환</sub>), 아니면 F<sub>s</sub> = 0. 공급액 농도 c<sub>S</sub>는 실행 중 고정합니다.</p>
         <p><b>겉보기 수율:</b> (최종 균체량 − 초기 균체량) ÷ 누적 소비 글루코스. 최종 균체량과는 다른 지표입니다.</p>
       </article>
@@ -422,7 +422,7 @@ td,th {font-variant-numeric:tabular-nums}
 (function(root){
   'use strict';
   const fixed=Object.freeze({muMax:.44,ks:.00266,y:.571,maintenance:.079,odToDcw:.27,
-    initialOD:.2,s0:10,volumeMax:2.5,hours:24,brothMax:50,doSat:7.53,density:1000,
+    initialOD:.2,s0:10,volumeMax:2.5,hours:24,brothMax:50,inletO2:.21,doTarget:2.26,doSat:7.53,density:1000,
     area:.0201,diameter:.064,impellers:2,np:5,gassed:.5,o2:12});
   const options=Object.freeze({mu:[.1,.2,.3,.4],rpm:Array.from({length:12},(_,i)=>(i+1)*100),
     volume:[.5,.6,.7,.8,.9,1],threshold:[5,4,3,2,1],vvm:[.5,1,2],
@@ -433,7 +433,7 @@ td,th {font-variant-numeric:tabular-nums}
     const air=vvm*volume;
     const vs=(air/60000)/fixed.area;
     const kla=3600*.026*pv**.4*vs**.5;
-    return {pv,vs,kla,air,capacity:kla*fixed.doSat/32};
+    return {pv,vs,kla,air,capacity:kla*(fixed.doSat-fixed.doTarget)/32};
   }
   function simulate(p){
     for(const key of Object.keys(options)) if(!options[key].includes(p[key])) throw Error('선택 범위를 확인해 주세요.');
@@ -446,20 +446,24 @@ td,th {font-variant-numeric:tabular-nums}
       const allowed=Math.max(0,(k.capacity/(f.o2*x)-f.maintenance)*f.y);
       const limited=allowed+1e-9<p.mu;
       const substrateLimited=monod+1e-9<p.mu;
-      const mu=Math.min(p.mu,monod,allowed);
+      const feedStage=feedAt!==null || s<=p.threshold+1e-8;
+      const mu=Math.min(feedStage?p.mu:f.muMax,monod,allowed);
       const qs=s>0?mu/f.y+f.maintenance:0;
       const uptake=Math.min(k.capacity,f.o2*qs*x);
       const dissolved=Math.max(0,f.doSat-32*uptake/k.kla);
-      const flow=!limited && !substrateLimited && s<=p.threshold+1e-8 && t<f.hours-1e-8 && volume<f.volumeMax-1e-8
+      const flow=s<=p.threshold+1e-8 && t<f.hours-1e-8 && volume<f.volumeMax-1e-8
         ?(p.mu/f.y+f.maintenance)*mass/(p.feed-p.threshold):0;
       return {t,x,s,volume,mu,qs,flow,air:k.air,otr:k.kla*(f.doSat-dissolved)/32,kla:k.kla,
         capacity:k.capacity,doPct:dissolved/f.doSat*100,limited,substrateLimited,used,mass,
         yield:used>0?(mass-initialMass)/used:null};
     }
     rows.push(state());
-    while(t<f.hours-1e-8 && volume<f.volumeMax-1e-8){
+    while(t<f.hours-1e-8){
       const a=state();
-      if(a.limited||a.substrateLimited) break;
+      if(feedAt===null && a.flow>0){
+        feedAt=t;
+        if(Math.abs(rows.at(-1).t-t)>1e-8) rows.push(a);
+      }
       let dt=Math.min(.005,f.hours-t,next-t,a.flow>0?(f.volumeMax-volume)/a.flow:Infinity);
       const consumption=Math.min(a.qs*mass, a.capacity*volume/f.o2);
       if(consumption>0 && a.s>p.threshold+1e-8){
@@ -475,13 +479,11 @@ td,th {font-variant-numeric:tabular-nums}
       mass+=Math.min(a.mu*mass*dt,uptake*f.y);
       used+=uptake;
       t+=dt;
-      if(feedAt===null && substrate/volume<=p.threshold+1e-8) feedAt=t;
       if(t>=next-1e-8){t=next;rows.push(state());next+=.5;}
     }
     const end=state();
     if(Math.abs(rows.at(-1).t-end.t)>1e-8) rows.push(end);
-    const reason=volume>=f.volumeMax-1e-8?'2.5 L 도달':t>=f.hours-1e-8?'24시간 도달':
-      end.limited?'산소 제한: 목표 μ 유지 불가':'기질 제한: 목표 μ 유지 불가';
+    const reason=volume>=f.volumeMax-1e-8?'24시간 완료 · 2.5 L에서 공급 중단':'24시간 완료';
     return {rows,end,feedAt,reason};
   }
   function compare(p){
@@ -553,7 +555,8 @@ td,th {font-variant-numeric:tabular-nums}
     ['장비 정격 / 용기 내경','5 L / 160 mm','장비 참고값 · 모델 부피 상한과 다름'],
     ['공기 유량 / 순산소','선택 vvm × 현재 배양 부피 / 사용 안 함','0.5 / 1 / 2 vvm 중 선택'],
     ['배양기 내부 글루코스','최대 50 g/L','공급 직후 혼합 농도 기준'],
-    ['포화 DO / 온도','7.53 mg/L / 30 °C','공기 기준'],
+    ['유입 산소 분율',(model.fixed.inletO2*100).toFixed(0)+'%','고정 가정값 · 공기만 공급'],
+    ['목표 용존산소 (DO₂)',model.fixed.doTarget.toFixed(2)+' mg/L (약 30%)','고정 가정값 · 산소 전달 한도 계산에 적용'],
     ['임펠러 / 동력수','Rushton 64 mm × 2단 / 5','동력식'],
     ['단면적 / 통기 동력비 / 밀도','201 cm² / 0.5 / 1000 kg/m³','kLa 계산 · 실제 액량 사용'],
     ['장비 통기 사양','AIR 1–10 L/min / O₂ 0.5–5 L/min','참고 전용']
