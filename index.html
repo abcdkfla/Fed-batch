@@ -24,16 +24,18 @@
   <div class="batchbar"><div class="vesselchip">V1 <small>단일 반응기</small></div><div class="strain-chip"><small>균주</small><strong><i>C. glutamicum</i> ATCC 13032</strong></div><small>ARA G-FLD 5 L · 작업 상한 2.5 L</small></div>
   <main>
     <section class="section" id="overview">
-      <div class="section-head"><h1>배양 개요</h1><p>운전 변수 5개 · 최대 24시간 · 30분 간격</p></div>
+      <div class="section-head"><h1>배양 개요</h1><p>운전 변수 6개 · 최대 24시간 · 30분 간격</p></div>
       <div class="workbench">
         <form id="setup" class="card">
-          <h2 class="panel-title">운전 설계 <span>5개 변수</span></h2>
+          <h2 class="panel-title">운전 설계 <span>6개 변수</span></h2>
           <label>목표 비성장속도 (h⁻¹)<select id="mu" aria-describedby="mu-help"></select></label>
           <p id="mu-help" class="t-secondary">첫 공급 이후 비성장속도 상한입니다. 산소나 글루코스가 부족하면 더 낮아집니다.</p>
           <label>교반 (rpm)<select id="rpm"></select></label>
           <label>초기 배양 부피 (L)<select id="volume"></select></label>
-          <label>공급액 글루코스 (g/L)<input id="feed" type="number" min="5" max="50" step="any" value="50" required aria-describedby="feed-help"></label>
-          <p id="feed-help" class="t-secondary">5 초과~50 g/L. 실행할 때 정한 농도를 모든 투입에 동일하게 적용합니다.</p>
+          <label>공기 통기량 (vvm)<select id="vvm" aria-describedby="air-help"></select></label>
+          <p id="air-help" class="t-secondary">실행 중 vvm은 일정하며, 공기 유량(L/min)은 vvm × 현재 부피(L)입니다.</p>
+          <label>공급액 글루코스 (g/L)<input id="feed" type="number" min="5" max="800" step="any" value="100" required aria-describedby="feed-help"></label>
+          <p id="feed-help" class="t-secondary">기본 100 g/L · 5 초과~800 g/L 직접 입력. 실행 중 농도는 고정하며, 혼합 후 배양기 내부는 50 g/L를 넘지 않도록 제한합니다.</p>
           <label>공급 개시 기준 (g/L)<select id="threshold" aria-describedby="threshold-help"></select></label>
           <p id="threshold-help" class="t-secondary">잔류 글루코스가 기준 이하이면 공급하고, 기준을 넘으면 멈췄다가 다시 내려오면 재개합니다.</p>
           <button class="btn primary" type="submit">▶ 시뮬레이션 실행</button>

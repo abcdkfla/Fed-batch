@@ -9,7 +9,8 @@
   }
   for(const [k,[label]] of Object.entries(series)) $('series').add(new Option(label,k));
   $('mu').value='.2'.replace(/^\./,'0.'); $('rpm').value='1200'; $('volume').value='1';
-  function params(){return Object.fromEntries(['mu','rpm','volume','threshold','feed'].map(k=>[k,$(k).valueAsNumber??Number($(k).value)]));}
+  $('vvm').value='1';
+  function params(){return Object.fromEntries(['mu','rpm','volume','threshold','feed','vvm'].map(k=>[k,$(k).valueAsNumber??Number($(k).value)]));}
   const cells=values=>values.map(v=>'<td>'+v+'</td>').join('');
   const sample=row=>keys.map(k=>k==='flow'?row[k]*1000:row[k]);
   function run(){
@@ -24,7 +25,7 @@
       $('ranking').innerHTML=ranked.map(r=>'<tr>'+cells([r.threshold,fmt(r.feedAt),fmt(r.end.t),fmt(r.end.mass),fmt(r.end.yield,4),'<button class="btn sm" type="button" data-threshold="'+r.threshold+'">적용</button>'])+'</tr>').join('');
       const metrics=[['균체 농도',fmt(e.x),'g/L'],['총 균체량',fmt(e.mass),'g'],['겉보기 수율',fmt(e.yield,4),'g/g'],['잔류 글루코스',fmt(e.s),'g/L'],['OTR',fmt(e.otr),'mmol/L/h'],['공급 개시',fmt(result.feedAt),result.feedAt==null?'미개시':'h']];
       $('metrics').innerHTML=metrics.map(([k,v,u])=>'<div class="tile"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="u">'+u+'</div></div>').join('');
-      $('end-info').textContent=fmt(e.t)+' h · '+result.reason;
+      $('end-info').textContent=fmt(e.t)+' h · '+result.reason+' · 종료 시 공기 '+fmt(e.air)+' L/min';
       $('vessel-label').textContent=fmt(e.volume)+' L / 2.50 L';
       const fill=e.volume/2.5*117;
       $('liquid').setAttribute('height',fill); $('liquid').setAttribute('y',167-fill);
@@ -53,7 +54,8 @@
     ['DCW 환산 / 초기 OD600','0.27 g/L per OD600 / 0.20','초기 균체량 계산 · 환산계수 미검증, 초기 OD는 기존 가정'],
     ['초기 글루코스 / 작업 부피 상한','10 g/L / 2.5 L','고정값'],
     ['장비 정격 / 용기 내경','5 L / 160 mm','장비 참고값 · 모델 부피 상한과 다름'],
-    ['공기 유량 / 순산소','5 L/min / 사용 안 함','5 L 정격 기준 1 vvm을 고정 가정'],
+    ['공기 유량 / 순산소','선택 vvm × 현재 배양 부피 / 사용 안 함','0.5 / 1 / 2 vvm 중 선택'],
+    ['배양기 내부 글루코스','최대 50 g/L','공급 직후 혼합 농도 기준'],
     ['포화 DO / 온도','7.53 mg/L / 30 °C','공기 기준'],
     ['임펠러 / 동력수','Rushton 64 mm × 2단 / 5','동력식'],
     ['단면적 / 통기 동력비 / 밀도','201 cm² / 0.5 / 1000 kg/m³','kLa 계산 · 실제 액량 사용'],
